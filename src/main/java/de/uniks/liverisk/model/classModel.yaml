@@ -1,0 +1,261 @@
+- c1: 	ClassModel
+  classes: 	player2 	unit3 	platform4 	game5 	
+  defaultPropertyStyle: 	POJO
+  defaultRoleType: 	"java.util.ArrayList<%s>"
+  mainJavaDir: 	"src/main/java"
+  packageName: 	de.uniks.liverisk.model
+  packageSrcFolder: 	"src/main/java/de/uniks/liverisk/model"
+
+- player2: 	Clazz
+  attributes: 	name6 	color7 	
+  model: 	c1
+  modified: 	false
+  name: 	Player
+  propertyStyle: 	POJO
+  roles: 	game8 	gameWon9 	currentGame10 	platforms11 	units12 	
+
+- unit3: 	Clazz
+  model: 	c1
+  modified: 	false
+  name: 	Unit
+  propertyStyle: 	POJO
+  roles: 	platform13 	player14 	
+
+- platform4: 	Clazz
+  attributes: 	capacity15 	xPos16 	yPos17 	
+  model: 	c1
+  modified: 	false
+  name: 	Platform
+  propertyStyle: 	POJO
+  roles: 	game18 	selectedBy19 	neighbors20 	neighbors21 	player22 	units23 	
+
+- game5: 	Clazz
+  attributes: 	name24 	
+  model: 	c1
+  modified: 	false
+  name: 	Game
+  propertyStyle: 	POJO
+  roles: 	platforms25 	selectedPlatform26 	players27 	winner28 	currentPlayer29 	
+
+- name6: 	Attribute
+  clazz: 	player2
+  modified: 	false
+  name: 	name
+  propertyStyle: 	POJO
+  type: 	String
+
+- color7: 	Attribute
+  clazz: 	player2
+  modified: 	false
+  name: 	color
+  propertyStyle: 	POJO
+  type: 	String
+
+- game8: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	player2
+  modified: 	false
+  name: 	game
+  other: 	players27
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- gameWon9: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	player2
+  modified: 	false
+  name: 	gameWon
+  other: 	winner28
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- currentGame10: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	player2
+  modified: 	false
+  name: 	currentGame
+  other: 	currentPlayer29
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- platforms11: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	player2
+  modified: 	false
+  name: 	platforms
+  other: 	player22
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- units12: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	player2
+  modified: 	false
+  name: 	units
+  other: 	player14
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- platform13: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	unit3
+  modified: 	false
+  name: 	platform
+  other: 	units23
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- player14: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	unit3
+  modified: 	false
+  name: 	player
+  other: 	units12
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- capacity15: 	Attribute
+  clazz: 	platform4
+  modified: 	false
+  name: 	capacity
+  propertyStyle: 	POJO
+  type: 	int
+
+- xPos16: 	Attribute
+  clazz: 	platform4
+  modified: 	false
+  name: 	xPos
+  propertyStyle: 	POJO
+  type: 	double
+
+- yPos17: 	Attribute
+  clazz: 	platform4
+  modified: 	false
+  name: 	yPos
+  propertyStyle: 	POJO
+  type: 	double
+
+- game18: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	platform4
+  modified: 	false
+  name: 	game
+  other: 	platforms25
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- selectedBy19: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	platform4
+  modified: 	false
+  name: 	selectedBy
+  other: 	selectedPlatform26
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- neighbors20: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	platform4
+  modified: 	false
+  name: 	neighbors
+  other: 	neighbors21
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- neighbors21: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	platform4
+  modified: 	false
+  name: 	neighbors
+  other: 	neighbors20
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- player22: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	platform4
+  modified: 	false
+  name: 	player
+  other: 	platforms11
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- units23: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	platform4
+  modified: 	false
+  name: 	units
+  other: 	platform13
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- name24: 	Attribute
+  clazz: 	game5
+  modified: 	false
+  name: 	name
+  propertyStyle: 	POJO
+  type: 	String
+
+- platforms25: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	game5
+  modified: 	false
+  name: 	platforms
+  other: 	game18
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- selectedPlatform26: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	game5
+  modified: 	false
+  name: 	selectedPlatform
+  other: 	selectedBy19
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- players27: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	game5
+  modified: 	false
+  name: 	players
+  other: 	game8
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- winner28: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	game5
+  modified: 	false
+  name: 	winner
+  other: 	gameWon9
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- currentPlayer29: 	AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	game5
+  modified: 	false
+  name: 	currentPlayer
+  other: 	currentGame10
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+

@@ -1,0 +1,16 @@
+group 'uniks'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {url'https://oss.sonatype.org/content/repositories/snapshots'}
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile "org.fulib:fulib:1.0.+"
+}

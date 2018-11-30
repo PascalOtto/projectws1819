@@ -82,6 +82,14 @@ public class TestModelActions {
         Player alice = new Player();
         GameController gc = new GameController();
         Game game = gc.init(alice, new Player());
-        Platform
+        Platform platform = alice.getPlatforms().get(0);
+        platform.setCapacity(3);
+        alice.withoutUnits(alice.getUnits().clone());
+        alice.withUnits(new Unit());
+        gc.reenforce(platform);
+        Assert.assertEquals(platform.getUnits().size(), 2);
+        for(Unit u : alice.getUnits()) {
+            Assert.assertFalse(u.getPlatform() == null);
+        }
     }
 }

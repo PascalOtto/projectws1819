@@ -1,25 +1,41 @@
 package de.uniks.liverisk;
 
+import de.uniks.liverisk.controller.GameController;
+import de.uniks.liverisk.model.Game;
+import de.uniks.liverisk.model.Player;
 import javafx.application.Application;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class MainApp extends Application {
     static final String STDFONT = "Verdana";
     static final int TITLE_SIZE = 30;
     static final int SUBTITLE_SIZE = 20;
-    static final String BUTTONSTYLE = "-fx-background-color: gold; -fx-border-color: red; -fx-font-size: 20px;" +
+    static final String BUTTONSTYLE = "-fx-background-color: aqua; -fx-border-color: grey; -fx-font-size: 20px;" +
             " -fx-padding: 10 120 10 120";
     static final Color[] DEFAULTCOLORS = {Color.RED, Color.YELLOW, Color.DARKGREEN, Color.BLUE};
     static final String[] DEFAULTNAMES = {"Georg", "Hans", "Joseph", "Chris"};
@@ -28,6 +44,9 @@ public class MainApp extends Application {
     private Button button_3Player;
     private Button button_4Player;
 
+    private ArrayList<StringProperty> propertyNames = new ArrayList<>();
+    private ArrayList<ObjectProperty<Color>> propertyColors = new ArrayList<>();
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         VBox vbox = new VBox(30);
@@ -35,7 +54,7 @@ public class MainApp extends Application {
         VBox vboxTitle = new VBox();
         vboxButtons.setStyle("-fx-background-color: white");
         vbox.setStyle("-fx-background-color: white");
-        vboxTitle.setStyle("-fx-background-color: aqua");
+        vboxTitle.setStyle("-fx-background-color: teal");
         Label title = new Label("Welcome to LiveRisk");
         title.setFont(Font.font(STDFONT, TITLE_SIZE));
         Label subTitle = new Label("Please select the number of players for this game!");
@@ -60,13 +79,13 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-    public void showPlayerSetting(ActionEvent e, Stage primaryStage) {
+    public void showPlayerSetting(ActionEvent event, Stage primaryStage) {
         VBox vbox = new VBox(30);
         vbox.setAlignment(Pos.CENTER);
         vbox.setStyle("-fx-background-color: white");
         VBox vboxTitle = new VBox();
         vboxTitle.setAlignment(Pos.CENTER);
-        vboxTitle.setStyle("-fx-background-color: aqua");
+        vboxTitle.setStyle("-fx-background-color: teal");
         Label title = new Label("Welcome to LiveRisk");
         title.setFont(Font.font(STDFONT, TITLE_SIZE));
         Label subTitle = new Label("Please choose player-names and colors");
@@ -75,28 +94,55 @@ public class MainApp extends Application {
         VBox vboxEdit = new VBox(10);
         vboxEdit.setAlignment(Pos.CENTER);
         int playerCount = 0;
-        if(e.getSource() == button_2Player) {
+        if(event.getSource() == button_2Player) {
             playerCount = 2;
         }
-        else if(e.getSource() == button_3Player) {
+        else if(event.getSource() == button_3Player) {
             playerCount = 3;
         }
-        else if(e.getSource() == button_4Player) {
+        else if(event.getSource() == button_4Player) {
             playerCount = 4;
         }
         for(int i = 0; i != playerCount; i++) {
             HBox hboxPlayer = new HBox(10);
             hboxPlayer.setAlignment(Pos.CENTER);
             TextField tfNamePlayer = new TextField(DEFAULTNAMES[i]);
+            propertyNames.add(tfNamePlayer.textProperty());
             ColorPicker cpPlayer = new ColorPicker(DEFAULTCOLORS[i]);
+            propertyColors.add(cpPlayer.valueProperty());
             cpPlayer.setStyle("-fx-background-color: white");
             hboxPlayer.getChildren().addAll(tfNamePlayer, cpPlayer);
             vboxEdit.getChildren().addAll(hboxPlayer);
         }
-        Button button_start = new Button("start");
+        Button button_start = new Button("Start");
+        button_start.setOnAction(e -> showGame(e, primaryStage));
         button_start.setStyle(BUTTONSTYLE);
         vbox.getChildren().addAll(vboxTitle, vboxEdit, button_start);
-        Scene scene = new Scene(vbox, 800, 600);
+        Scene scene = new Scene(vbox, primaryStage.getWidth(), primaryStage.getHeight());
         primaryStage.setScene(scene);
+    }
+
+    public void showGame(ActionEvent event, Stage primaryStage){
+        Game game;
+        GameController gc = new GameController();
+        ArrayList<Player> player = new ArrayList<>();
+        for(int i = 0; i != propertyNames.size(); i++) {
+            player.add(new Player().setName(propertyNames.get(i).getValue())
+                            .setColor(propertyColors.get(i).getValue().toString().substring(2)));
+        }
+        game = gc.init(player, gc.createSimpleMap(), 1, "Liverisk", true);
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ingame.fxml"));
+        try {
+            Parent parent = fxmlLoader.load();
+            ((IngameController)fxmlLoader.getController()).myInitialize(game);
+            Scene scene = new Scene(parent, primaryStage.getWidth(), primaryStage.getHeight());
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        }
+        catch(IOException e) {
+            Logger.getGlobal().log(Level.SEVERE, "FXML Datei nicht gefunden!");
+            e.printStackTrace();
+        }
     }
 }

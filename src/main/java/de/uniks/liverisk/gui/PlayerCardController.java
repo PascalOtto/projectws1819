@@ -1,4 +1,4 @@
-package de.uniks.liverisk;
+package de.uniks.liverisk.gui;
 
 import de.uniks.liverisk.model.Player;
 import javafx.collections.ObservableList;
@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
 
 public class PlayerCardController {
@@ -17,6 +18,9 @@ public class PlayerCardController {
 
     @FXML
     HBox meepleContainer;
+
+    @FXML
+    Rectangle colorBox;
 
     Player player;
 
@@ -27,6 +31,7 @@ public class PlayerCardController {
     public void setPlayer(Player player) {
         this.player = player;
         labelPlayerName.setText(player.getName());
+        colorBox.setFill(Paint.valueOf(player.getColor()));
         player.addPropertyChangeListener("units", e -> update());
         ObservableList<Node> children = meepleContainer.getChildren();
         boolean active = true;

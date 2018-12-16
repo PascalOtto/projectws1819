@@ -1,4 +1,4 @@
-package de.uniks.liverisk;
+package de.uniks.liverisk.gui;
 
 import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Player;

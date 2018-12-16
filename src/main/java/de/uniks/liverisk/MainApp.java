@@ -1,11 +1,11 @@
 package de.uniks.liverisk;
 
 import de.uniks.liverisk.controller.GameController;
+import de.uniks.liverisk.gui.IngameController;
 import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Player;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -22,12 +22,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import javax.imageio.ImageIO;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -130,9 +126,11 @@ public class MainApp extends Application {
             player.add(new Player().setName(propertyNames.get(i).getValue())
                             .setColor(propertyColors.get(i).getValue().toString().substring(2)));
         }
+        propertyNames.clear();
+        propertyColors.clear();
         game = gc.init(player, gc.createSimpleMap(), 1, "Liverisk", true);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ingame.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gui/ingame.fxml"));
         try {
             Parent parent = fxmlLoader.load();
             ((IngameController)fxmlLoader.getController()).myInitialize(game);

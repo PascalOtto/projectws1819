@@ -1,12 +1,14 @@
 package de.uniks.liverisk.gui;
 
 import de.uniks.liverisk.model.Game;
+import de.uniks.liverisk.model.Platform;
 import de.uniks.liverisk.model.Player;
 import de.uniks.liverisk.model.Unit;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -18,16 +20,15 @@ public class IngameController {
     VBox playerList;
 
     @FXML
-    Button testButton;
+    AnchorPane playground;
 
     private Game game;
 
     public void myInitialize(Game game) {
-        testButton.setOnAction(e->test());
         this.game = game;
         for(Player p : game.getPlayers()) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("playerCard.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("player_card.fxml"));
                 Parent parent = fxmlLoader.load();
                 playerList.getChildren().add(parent);
                 PlayerCardController pcc = fxmlLoader.getController();
@@ -37,9 +38,19 @@ public class IngameController {
                 e.printStackTrace();
             }
         }
-    }
 
-    public void test() {
-        game.getPlayers().get(0).withUnits(new Unit());
+        //Create PlatformsViews
+        for(Platform plat : game.getPlatforms()) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("platform.fxml"));
+            try {
+                Parent parent = fxmlLoader.load();
+                PlatformController platCon = fxmlLoader.getController();
+                platCon.setPlatform(plat);
+                playground.getChildren().add(parent);
+            } catch (IOException e) {
+                Logger.getGlobal().log(Level.SEVERE, "FXML Datei nicht gefunden!");
+                e.printStackTrace();
+            }
+        }
     }
 }

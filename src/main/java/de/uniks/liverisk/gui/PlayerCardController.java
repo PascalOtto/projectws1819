@@ -11,8 +11,11 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class PlayerCardController {
+
+public class PlayerCardController implements PropertyChangeListener {
     @FXML
     Label labelPlayerName;
 
@@ -30,9 +33,17 @@ public class PlayerCardController {
 
     public void setPlayer(Player player) {
         this.player = player;
-        labelPlayerName.setText(player.getName());
-        colorBox.setFill(Paint.valueOf(player.getColor()));
-        player.addPropertyChangeListener("units", e -> update());
+        player.addPropertyChangeListener(this);
+        updateView();
+    }
+
+    public void updateView() {
+       updatePlayerName();
+       updatePlayerColor();
+       updateUnitCount();
+    }
+
+    public void updateUnitCount() {
         ObservableList<Node> children = meepleContainer.getChildren();
         boolean active = true;
         int i = 0;
@@ -42,22 +53,34 @@ public class PlayerCardController {
             }
             Circle circle = (Circle) n;
             circle.setVisible(active);
-            circle.setFill(Paint.valueOf(player.getColor()));
             i++;
         }
     }
 
-    public void update() {
+    public void updatePlayerName() {
+        labelPlayerName.setText(player.getName());
+    }
+
+    public void updatePlayerColor() {
         ObservableList<Node> children = meepleContainer.getChildren();
-        boolean active = true;
-        int i = 0;
         for(Node n : children) {
-            if(player.getUnits().size() == i) {
-                active = false;
-            }
             Circle circle = (Circle) n;
-            circle.setVisible(active);
-            i++;
+            circle.setFill(Paint.valueOf(player.getColor()));
+        }
+
+        colorBox.setFill(Paint.valueOf(player.getColor()));
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName() == Player.PROPERTY_name) {
+            updatePlayerName();
+        }
+        else if (evt.getPropertyName() == Player.PROPERTY_color) {
+            updatePlayerColor();
+        }
+        else if (evt.getPropertyName() == Player.PROPERTY_units) {
+            updateUnitCount();
         }
     }
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.Double?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Polygon?>
+
+<AnchorPane fx:id="mainPane" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.PlatformController">
+   <children>
+      <Polygon fx:id="platformPolygon" fill="DODGERBLUE" layoutX="50.0" layoutY="43.0" stroke="BLACK" strokeType="INSIDE">
+        <points>
+          <Double fx:value="25.0" />
+          <Double fx:value="-43.0" />
+          <Double fx:value="-25.0" />
+          <Double fx:value="-43.0" />
+          <Double fx:value="-50.0" />
+          <Double fx:value="0.0" />
+            <Double fx:value="-25.0" />
+            <Double fx:value="43.0" />
+            <Double fx:value="25.0" />
+            <Double fx:value="43.0" />
+            <Double fx:value="50.0" />
+            <Double fx:value="0.00" />
+            <Double fx:value="25.0" />
+            <Double fx:value="-43.0" />
+        </points>
+      </Polygon>
+      <AnchorPane fx:id="meepleFigures" layoutX="1.0" prefHeight="86.0" prefWidth="100.0">
+         <children>
+            <Circle fill="WHITE" layoutX="34.0" layoutY="14.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="66.0" layoutY="14.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="34.0" layoutY="72.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="66.0" layoutY="72.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="14.0" layoutY="43.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="86.0" layoutY="43.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="50.0" layoutY="33.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fill="WHITE" layoutX="50.0" layoutY="53.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

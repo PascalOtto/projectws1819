@@ -4,14 +4,24 @@ import de.uniks.liverisk.logic.GameController;
 import de.uniks.liverisk.model.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.input.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlatformUIController implements PropertyChangeListener {
     @FXML
@@ -25,6 +35,7 @@ public class PlatformUIController implements PropertyChangeListener {
     Platform platform;
 
     static PlatformUIController selectedPlatform = null;
+    static List<LineUIController> lines = new ArrayList<>();
 
     public void onMouseClicked(MouseEvent mouseEvent) {
         switch(mouseEvent.getButton()) {
@@ -89,8 +100,25 @@ public class PlatformUIController implements PropertyChangeListener {
         else if(evt.getPropertyName() == Platform.PROPERTY_capacity) {
             updateCapacity();
         }
+        else if(evt.getPropertyName() == Platform.PROPERTY_neighbors) {
+            updateNeighbors();
+        }
         else if(evt.getPropertyName() == Platform.PROPERTY_xPos || evt.getPropertyName() == Platform.PROPERTY_yPos) {
             updatePosition();
+        }
+    }
+
+    private void updateNeighbors() {
+        outer: for(Platform p : platform.getNeighbors()) {
+            for (LineUIController l : lines) {
+                if (l.compare(platform, p)) {
+                    continue outer;
+                }
+            }
+            //Create Line
+            LineUIController linectrl = new LineUIController();
+            linectrl.initialize(platform, p, 101, 86);
+            lines.add(linectrl);
         }
     }
 
@@ -113,6 +141,7 @@ public class PlatformUIController implements PropertyChangeListener {
         updateColor();
         updateCapacity();
         updatePosition();
+        updateNeighbors();
     }
 
     public void updateColor() {
@@ -121,6 +150,11 @@ public class PlatformUIController implements PropertyChangeListener {
         }
         else {
             platformPolygon.setFill(Paint.valueOf(platform.getPlayer().getColor()));
+            for(Platform n : platform.getNeighbors()) {
+                if(n.getPlayer() == platform.getPlayer()) {
+                    searchLine(n).setColor(getColor());
+                }
+            }
         }
     }
 
@@ -153,5 +187,19 @@ public class PlatformUIController implements PropertyChangeListener {
     public void unselect() {
         selectionPane.setVisible(false);
         selectedPlatform = null;
+    }
+
+    public LineUIController searchLine(Platform p) {
+        for(LineUIController ctrl : lines) {
+            if(ctrl.compare(platform, p)) {
+                return ctrl;
+            }
+        }
+        Logger.getGlobal().log(Level.WARNING, "Line does not exist");
+        return null;
+    }
+
+    public Paint getColor() {
+        return platformPolygon.getFill();
     }
 }

@@ -29,6 +29,7 @@ public class IngameUIController {
     private Game game;
 
     public void myInitialize(Game game) {
+        LineUIController.playground = playground;
         this.game = game;
         for(Player p : game.getPlayers()) {
             try {

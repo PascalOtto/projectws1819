@@ -5,9 +5,13 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
@@ -24,6 +28,11 @@ public class PlayerCardUIController implements PropertyChangeListener {
 
     @FXML
     Rectangle colorBox;
+
+    @FXML
+    ImageView skullImage;
+    @FXML
+    VBox mainBox;
 
     Player player;
 
@@ -81,6 +90,16 @@ public class PlayerCardUIController implements PropertyChangeListener {
         }
         else if (evt.getPropertyName() == Player.PROPERTY_units) {
             updateUnitCount();
+        }
+        else if (evt.getPropertyName() == Player.PROPERTY_platforms) {
+            updateAlive();
+        }
+    }
+
+    private void updateAlive() {
+        if(player.getPlatforms().isEmpty()) {
+            skullImage.setVisible(true);
+            mainBox.setOpacity(0.5);
         }
     }
 }

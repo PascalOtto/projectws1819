@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Polygon?>
 
-<AnchorPane fx:id="mainPane" onMouseClicked="#onMouseClicked" prefWidth="101.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.PlatformUIController">
+<AnchorPane fx:id="mainPane" maxHeight="86.0" maxWidth="101.0" minHeight="86.0" minWidth="101.0" onMouseClicked="#onMouseClicked" prefHeight="86.0" prefWidth="101.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.PlatformUIController">
    <children>
       <Polygon fx:id="platformPolygon" fill="DODGERBLUE" layoutX="50.0" layoutY="43.0" stroke="BLACK" strokeType="INSIDE">
         <points>

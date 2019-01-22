@@ -5,8 +5,6 @@ import de.uniks.liverisk.model.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 public class TestModelActions {
     @Test
     /*Alice bewegt eine Einheit

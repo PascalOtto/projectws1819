@@ -1,4 +1,4 @@
-package de.uniks.liverisk.controller;
+package de.uniks.liverisk.logic;
 
 import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Platform;
@@ -7,12 +7,19 @@ import de.uniks.liverisk.model.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameController {
+    static final int MAXUNITS = 16;
+    static final int TIME_PER_ROUND = 10000;
+
+    static List<NonPlayerCharacter> npcs = new ArrayList<>();
     @Deprecated
-    public Game init(Player... players) {
+    static public Game init(Player... players) {
         if(players.length < 2) {
             return null;
         }
@@ -57,7 +64,7 @@ public class GameController {
      * @param platforms
      * @param gameName
      */
-    public Game init(List<Player> players, List<Platform> platforms, int startUnitsCount, String gameName
+    static public Game init(List<Player> players, Player human, List<Platform> platforms, int startUnitsCount, String gameName
             , boolean randomStartPlat) {
         Game game = new Game();
         if(players.size() < 2) {
@@ -75,6 +82,10 @@ public class GameController {
             }
         }
         for(Player p : players) {
+            if(p != human) {
+                npcs.add(new NonPlayerCharacter(p));
+            }
+
             if(randomStartPlat) {
                 for(Platform plat : platforms) {
                     if(plat.getPlayer() == null) {
@@ -105,10 +116,36 @@ public class GameController {
         }
         game.withPlayers(players).withPlatforms(platforms);
         game.setCurrentPlayer(players.get(0)).setName(gameName);
+
+        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+        exec.scheduleAtFixedRate(new Runnable() {
+
+            @Override
+            public void run() {
+                gameLoop(game);
+            }
+        }, 0, TIME_PER_ROUND, TimeUnit.MILLISECONDS);
+
         return game;
     }
 
-    public void move(Platform source, Platform destination) {
+    static private void gameLoop(Game game) {
+        for(NonPlayerCharacter npc : npcs) {
+            npc.reinforce();
+        }
+
+        for(Player p : game.getPlayers()) {
+            for(int i = 0; i != p.getPlatforms().size() && p.getUnits().size() != MAXUNITS; i++) {
+                p.withUnits(new Unit());
+            }
+        }
+
+        for(NonPlayerCharacter npc : npcs) {
+            npc.attack();
+        }
+    }
+
+    static public void move(Platform source, Platform destination) {
         if(source == null || destination == null) {
             Logger.getGlobal().log(Level.WARNING, "source or destination is null!");
             return;
@@ -141,7 +178,7 @@ public class GameController {
         source.getUnits().get(0).setPlatform(destination);
     }
 
-    public void reenforce(Platform platform) {
+    static public void reenforce(Platform platform) {
         if(platform == null) {
             Logger.getGlobal().log(Level.WARNING, "platform is null!");
             return;
@@ -150,18 +187,20 @@ public class GameController {
             Logger.getGlobal().log(Level.WARNING, "No player owns this platform!");
             return;
         }
-        else if(platform.getCapacity() - platform.getUnits().size() == 0) {
-            Logger.getGlobal().log(Level.WARNING, "This more space on this platform");
+        else if(platform.getCapacity() == platform.getUnits().size()) {
+            Logger.getGlobal().log(Level.WARNING, "No more space on this platform");
             return;
         }
         for(Unit u : platform.getPlayer().getUnits()) {
             if(u.getPlatform() == null) {
                 u.setPlatform(platform);
+                u.setPlayer(null);
+                return;
             }
         }
     }
 
-    public void attack(Platform source, Platform destination) {
+    static public void attack(Platform source, Platform destination) {
         if(source == null || destination == null) {
             Logger.getGlobal().log(Level.WARNING, "source or destination is null!");
             return;
@@ -188,6 +227,7 @@ public class GameController {
             source.getUnits().get(0).removeYou();
         }
         if(destination.getUnits().size() == 0) {
+            destination.setPlayer(null);
             while(source.getUnits().size() > 1) {
                 destination.setPlayer(source.getPlayer());
                 source.getUnits().get(0).setPlatform(destination);
@@ -195,7 +235,7 @@ public class GameController {
         }
     }
 
-    public List<Platform> createSimpleMap() {
+    static public List<Platform> createSimpleMap() {
         Platform p1 = new Platform().setXPos(50).setYPos(200).setCapacity(5);
         Platform p2 = new Platform().setXPos(650).setYPos(200).setCapacity(5);
         Platform p3 = new Platform().setXPos(300).setYPos(100).setCapacity(3);

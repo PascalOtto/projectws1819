@@ -15,7 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 
-public class PlayerCardController implements PropertyChangeListener {
+public class PlayerCardUIController implements PropertyChangeListener {
     @FXML
     Label labelPlayerName;
 

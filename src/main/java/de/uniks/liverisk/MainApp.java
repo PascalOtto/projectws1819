@@ -1,7 +1,7 @@
 package de.uniks.liverisk;
 
-import de.uniks.liverisk.controller.GameController;
-import de.uniks.liverisk.gui.IngameController;
+import de.uniks.liverisk.gui.IngameUIController;
+import de.uniks.liverisk.logic.GameController;
 import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Player;
 import javafx.application.Application;
@@ -34,7 +34,7 @@ public class MainApp extends Application {
     static final String BUTTONSTYLE = "-fx-background-color: aqua; -fx-border-color: grey; -fx-font-size: 20px;" +
             " -fx-padding: 10 120 10 120";
     static final Color[] DEFAULTCOLORS = {Color.RED, Color.YELLOW, Color.DARKGREEN, Color.BLUE};
-    static final String[] DEFAULTNAMES = {"Georg", "Hans", "Joseph", "Chris"};
+    static final String[] DEFAULTNAMES = {"Georg", "Hans", "Joseph", "Franz"};
 
     private Button button_2Player;
     private Button button_3Player;
@@ -45,6 +45,8 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        primaryStage.setOnCloseRequest(event -> {System.exit(0);});
+
         VBox vbox = new VBox(30);
         VBox vboxButtons = new VBox(20);
         VBox vboxTitle = new VBox();
@@ -120,7 +122,6 @@ public class MainApp extends Application {
 
     public void showGame(ActionEvent event, Stage primaryStage){
         Game game;
-        GameController gc = new GameController();
         ArrayList<Player> player = new ArrayList<>();
         for(int i = 0; i != propertyNames.size(); i++) {
             player.add(new Player().setName(propertyNames.get(i).getValue())
@@ -128,12 +129,12 @@ public class MainApp extends Application {
         }
         propertyNames.clear();
         propertyColors.clear();
-        game = gc.init(player, gc.createSimpleMap(), 1, "Liverisk", true);
+        game = GameController.init(player, player.get(0), GameController.createSimpleMap(), 1, "Liverisk", true);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gui/ingame.fxml"));
         try {
             Parent parent = fxmlLoader.load();
-            ((IngameController)fxmlLoader.getController()).myInitialize(game);
+            ((IngameUIController)fxmlLoader.getController()).myInitialize(game);
             Scene scene = new Scene(parent, primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setScene(scene);
             primaryStage.show();

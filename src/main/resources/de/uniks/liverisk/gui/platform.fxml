@@ -3,9 +3,10 @@
 <?import java.lang.Double?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Polygon?>
 
-<AnchorPane fx:id="mainPane" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.PlatformController">
+<AnchorPane fx:id="mainPane" onMouseClicked="#onMouseClicked" prefWidth="101.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.PlatformUIController">
    <children>
       <Polygon fx:id="platformPolygon" fill="DODGERBLUE" layoutX="50.0" layoutY="43.0" stroke="BLACK" strokeType="INSIDE">
         <points>
@@ -35,6 +36,14 @@
             <Circle fill="WHITE" layoutX="86.0" layoutY="43.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
             <Circle fill="WHITE" layoutX="50.0" layoutY="33.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
             <Circle fill="WHITE" layoutX="50.0" layoutY="53.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="selectionPane" visible="false">
+         <children>
+            <Line endX="98.0" />
+            <Line endY="85.0" />
+            <Line endX="98.0" layoutY="85.0" />
+            <Line endY="85.0" layoutX="98.0" />
          </children>
       </AnchorPane>
    </children>

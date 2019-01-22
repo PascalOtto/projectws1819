@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.IngameController">
+<HBox alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.IngameUIController">
    <children>
       <AnchorPane fx:id="playground" prefHeight="400.0" prefWidth="600.0" />
       <VBox fx:id="playerList" alignment="TOP_CENTER" prefHeight="400.0" prefWidth="100.0" spacing="30.0" style="-fx-background-color: teal;" />

@@ -1,6 +1,6 @@
 package test;
 
-import de.uniks.liverisk.controller.*;
+import de.uniks.liverisk.logic.GameController;
 import de.uniks.liverisk.model.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +12,7 @@ public class TestModelCreation {
     public void test() {
         Player firstp = new Player();
         Player secondp = new Player();
-        Game game = new GameController().init(firstp, secondp);
+        Game game = GameController.init(firstp, secondp);
         Assert.assertEquals(game.getPlayers().size(), 2);
         for(Player p : game.getPlayers()) {
             Assert.assertEquals(p.getUnits().size(), 5);

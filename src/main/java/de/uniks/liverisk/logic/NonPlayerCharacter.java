@@ -1,6 +1,5 @@
 package de.uniks.liverisk.logic;
 
-import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Platform;
 import de.uniks.liverisk.model.Player;
 

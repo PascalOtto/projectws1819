@@ -1,6 +1,6 @@
 package test;
 
-import de.uniks.liverisk.controller.GameController;
+import de.uniks.liverisk.logic.GameController;
 import de.uniks.liverisk.model.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,8 +16,7 @@ public class TestModelActions {
     public void testMove() {
         Player Alice = new Player();
         Player player2 = new Player();
-        GameController gc = new GameController();
-        Game game = gc.init(Alice, player2);
+        Game game = GameController.init(Alice, player2);
 
         Platform platform1 = Alice.getPlatforms().get(0);
         Platform platform2 = platform1.getNeighbors().get(0);
@@ -27,14 +26,14 @@ public class TestModelActions {
         Assert.assertEquals(platform1.getUnits().size(), 5);
         Assert.assertEquals(platform2.getPlayer(), null);
         Assert.assertEquals(platform2.getUnits().size(), 0);
-        gc.move(null, null);
-        gc.move(platform1, platform1);
-        gc.move(platform1, player2.getPlatforms().get(0));
+        GameController.move(null, null);
+        GameController.move(platform1, platform1);
+        GameController.move(platform1, player2.getPlatforms().get(0));
         Assert.assertEquals(platform2.getPlayer(), null);
         Assert.assertEquals(platform2.getUnits().size(), 0);
-        gc.move(platform1, platform2);
-        gc.move(platform1, platform2);
-        gc.move(platform1, platform2);
+        GameController.move(platform1, platform2);
+        GameController.move(platform1, platform2);
+        GameController.move(platform1, platform2);
         Assert.assertEquals(platform1.getUnits().size(), 2);
         Assert.assertEquals(platform2.getUnits().size(), 3);
         Assert.assertEquals(platform2.getPlayer(), Alice);

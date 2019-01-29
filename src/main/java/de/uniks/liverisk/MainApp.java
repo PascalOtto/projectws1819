@@ -9,7 +9,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -129,7 +132,11 @@ public class MainApp extends Application {
         }
         propertyNames.clear();
         propertyColors.clear();
-        game = GameController.init(player, player.get(0), GameController.createSimpleMap(), 1, "Liverisk", true);
+        //game = GameController.init(player, player.get(0), GameController.createSimpleMap(), 1, "Liverisk", true);
+        Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+        game = GameController.init(player, player.get(0)
+                , GameController.createRandomMap((int)(screenBounds.getWidth()*0.5), (int)(screenBounds.getHeight()*0.5), 150, player.size())
+                , 1, "Liverisk", true);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gui/ingame.fxml"));
         try {

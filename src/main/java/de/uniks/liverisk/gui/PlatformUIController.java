@@ -61,7 +61,8 @@ public class PlatformUIController implements PropertyChangeListener {
         else if(selectedPlatform == this) {
             unselect();
         }
-        else if(this.platform.getNeighbors().contains(selectedPlatform.platform) ) {
+        else if(this.platform.getNeighbors().contains(selectedPlatform.platform)
+                    && selectedPlatform.platform.getPlayer() == platform.getGame().getCurrentPlayer()) {
             if(selectedPlatform.platform.getUnits().size() > 1) {
                 if (this.platform.getPlayer() == null || selectedPlatform.platform.getPlayer() == this.platform.getPlayer()) {
                     if(this.platform.getUnits().size() == this.platform.getCapacity()) {

@@ -4,7 +4,7 @@ import java.beans.PropertyChangeSupport;
 
 import java.beans.PropertyChangeListener;
 
-public class Platform 
+public class Platform  
 {
 
    public static final String PROPERTY_capacity = "capacity";
@@ -386,6 +386,34 @@ public Platform withoutNeighbors(Object... value)
 
 
    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

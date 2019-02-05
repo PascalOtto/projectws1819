@@ -22,14 +22,23 @@ import java.util.logging.Logger;
 
 public class GameController {
     static final int MAXUNITS = 16;
-    static final int TIME_PER_ROUND = 10000;
+    static final int UPDATE_RATE = 50;
 
     static  Random ran = new Random();
     static List<NonPlayerCharacter> npcs = new ArrayList<>();
     static PersistenceUtil persistenceUtil = new PersistenceUtil();
-    static boolean running = false;
 
     static private void gameLoop(Game game) {
+        if(game.getWinner() != null) {
+            game.setTimeLeft(game.getTimePerRound());
+            return;
+        }
+        if(game.getTimeLeft() > 0) {
+            game.setTimeLeft(game.getTimeLeft()-UPDATE_RATE);
+            return;
+        }
+        game.setTimeLeft(game.getTimePerRound());
+
         for(NonPlayerCharacter npc : npcs) {
             npc.reinforce();
         }
@@ -48,7 +57,7 @@ public class GameController {
     }
 
     static public void startGameloop(Game game) {
-        if(running == false) {
+        if(game.getIsRunning() == false) {
             ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
             exec.scheduleAtFixedRate(new Runnable() {
 
@@ -56,8 +65,8 @@ public class GameController {
                 public void run() {
                     gameLoop(game);
                 }
-            }, TIME_PER_ROUND, TIME_PER_ROUND, TimeUnit.MILLISECONDS);
-            running = true;
+            }, UPDATE_RATE, UPDATE_RATE, TimeUnit.MILLISECONDS);
+            game.setIsRunning(true);
         }
     }
 

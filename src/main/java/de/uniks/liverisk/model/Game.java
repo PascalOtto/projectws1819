@@ -4,7 +4,7 @@ import java.beans.PropertyChangeSupport;
 
 import java.beans.PropertyChangeListener;
 
-public class Game 
+public class Game  
 {
 
    public static final String PROPERTY_name = "name";
@@ -350,6 +350,69 @@ public class Game
       this.withoutPlayers(this.getPlayers().clone());
 
 
+   }
+
+
+   public static final String PROPERTY_timeLeft = "timeLeft";
+
+   private int timeLeft;
+
+   public int getTimeLeft()
+   {
+      return timeLeft;
+   }
+
+   public Game setTimeLeft(int value)
+   {
+      if (value != this.timeLeft)
+      {
+         int oldValue = this.timeLeft;
+         this.timeLeft = value;
+         firePropertyChange("timeLeft", oldValue, value);
+      }
+      return this;
+   }
+
+
+   public static final String PROPERTY_timePerRound = "timePerRound";
+
+   private int timePerRound = 10000;
+
+   public int getTimePerRound()
+   {
+      return timePerRound;
+   }
+
+   public Game setTimePerRound(int value)
+   {
+      if (value != this.timePerRound)
+      {
+         int oldValue = this.timePerRound;
+         this.timePerRound = value;
+         firePropertyChange("timePerRound", oldValue, value);
+      }
+      return this;
+   }
+
+
+   public static final String PROPERTY_isRunning = "isRunning";
+
+   private boolean isRunning = false;
+
+   public boolean getIsRunning()
+   {
+      return isRunning;
+   }
+
+   public Game setIsRunning(boolean value)
+   {
+      if (value != this.isRunning)
+      {
+         boolean oldValue = this.isRunning;
+         this.isRunning = value;
+         firePropertyChange("isRunning", oldValue, value);
+      }
+      return this;
    }
 
 

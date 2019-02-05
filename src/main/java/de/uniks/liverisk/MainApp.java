@@ -51,7 +51,10 @@ public class MainApp extends Application {
     private ArrayList<ObjectProperty<Color>> propertyColors = new ArrayList<>();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        propertyNames.clear();
+        propertyColors.clear();
+
         primaryStage.setOnCloseRequest(event -> {System.exit(0);});
 
         VBox vbox = new VBox(30);
@@ -73,7 +76,7 @@ public class MainApp extends Application {
         button_4Player = new Button("Start 4-Player Game");
         button_4Player.setStyle(BUTTONSTYLE);
         button_4Player.setOnAction(e -> showPlayerSetting(e, primaryStage));
-        loadButton = new Button("Load");
+        loadButton = new Button("Continue");
         loadButton.setStyle("-fx-background-color: orange; -fx-border-color: grey; -fx-font-size: 20px;");
         loadButton.setOnAction(e -> loadGame(e, primaryStage));
         loadingFailedLabel = new Label("Loading failed!");
@@ -128,7 +131,10 @@ public class MainApp extends Application {
         Button button_start = new Button("Start");
         button_start.setOnAction(e -> showGame(e, primaryStage, null));
         button_start.setStyle(BUTTONSTYLE);
-        vbox.getChildren().addAll(vboxTitle, vboxEdit, button_start);
+        Button backButton = new Button("back");
+        backButton.setStyle("-fx-background-color: orange; -fx-border-color: grey; -fx-font-size: 20px;");
+        backButton.setOnAction(e -> start(primaryStage));
+        vbox.getChildren().addAll(vboxTitle, vboxEdit, button_start, backButton);
         Scene scene = new Scene(vbox, primaryStage.getWidth(), primaryStage.getHeight());
         primaryStage.setScene(scene);
     }
@@ -160,7 +166,7 @@ public class MainApp extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gui/ingame.fxml"));
         try {
             Parent parent = fxmlLoader.load();
-            ((IngameUIController)fxmlLoader.getController()).myInitialize(game);
+            ((IngameUIController)fxmlLoader.getController()).myInitialize(game, primaryStage, this);
             Scene scene = new Scene(parent, primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setScene(scene);
             primaryStage.show();

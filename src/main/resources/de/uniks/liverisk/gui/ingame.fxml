@@ -7,6 +7,10 @@
 <HBox alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.IngameUIController">
    <children>
       <AnchorPane fx:id="playground" prefHeight="400.0" prefWidth="600.0" />
-      <VBox fx:id="playerList" alignment="TOP_CENTER" prefHeight="400.0" prefWidth="100.0" spacing="30.0" style="-fx-background-color: teal;" />
+      <VBox fx:id="sidebar" alignment="TOP_CENTER" layoutX="610.0" layoutY="10.0" prefHeight="400.0" prefWidth="100.0" spacing="30.0" style="-fx-background-color: blue;">
+         <children>
+            <VBox fx:id="playerList" alignment="TOP_CENTER" prefHeight="400.0" prefWidth="100.0" spacing="30.0" style="-fx-background-color: teal;" />
+         </children>
+      </VBox>
    </children>
 </HBox>

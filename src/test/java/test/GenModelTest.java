@@ -18,7 +18,10 @@ public class GenModelTest {
                 .buildAttribute("xPos", mb.DOUBLE)
                 .buildAttribute("yPos", mb.DOUBLE);
         ClassBuilder game = mb.buildClass("Game")
-                .buildAttribute("name", mb.STRING);
+                .buildAttribute("name", mb.STRING)
+                .buildAttribute("timeLeft", mb.INT)
+                .buildAttribute("timePerRound", mb.INT, "10000")
+                .buildAttribute("isRunning", mb.BOOLEAN, "false");
 
         game.buildAssociation(platform, "platforms", mb.MANY, "game", mb.ONE);
         game.buildAssociation(platform, "selectedPlatform", mb.ONE, "selectedBy", mb.ONE);

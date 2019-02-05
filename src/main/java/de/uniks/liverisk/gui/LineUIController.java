@@ -33,7 +33,7 @@ public class LineUIController {
     }
 
     boolean compare(Platform a, Platform b) {
-       if(this.a == a && this.b == b || this.a == b && this.b == a) {
+       if((this.a == a && this.b == b) || (this.a == b && this.b == a)) {
            return true;
        }
        return false;

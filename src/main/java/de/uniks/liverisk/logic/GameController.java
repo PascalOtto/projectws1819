@@ -2,6 +2,7 @@ package de.uniks.liverisk.logic;
 
 import com.sun.javafx.geom.Line2D;
 import com.sun.javafx.geom.RectBounds;
+import de.uniks.liverisk.gui.PersistenceUtil;
 import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Platform;
 import de.uniks.liverisk.model.Player;
@@ -25,6 +26,49 @@ public class GameController {
 
     static  Random ran = new Random();
     static List<NonPlayerCharacter> npcs = new ArrayList<>();
+    static PersistenceUtil persistenceUtil = new PersistenceUtil();
+    static boolean running = false;
+
+    static private void gameLoop(Game game) {
+        for(NonPlayerCharacter npc : npcs) {
+            npc.reinforce();
+        }
+
+        for(Player p : game.getPlayers()) {
+            for(int i = 0; i != p.getPlatforms().size() && p.getUnits().size() != MAXUNITS; i++) {
+                p.withUnits(new Unit());
+            }
+        }
+
+        for(NonPlayerCharacter npc : npcs) {
+            npc.attack();
+        }
+
+        persistenceUtil.save(game);
+    }
+
+    static public void startGameloop(Game game) {
+        if(running == false) {
+            ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+            exec.scheduleAtFixedRate(new Runnable() {
+
+                @Override
+                public void run() {
+                    gameLoop(game);
+                }
+            }, TIME_PER_ROUND, TIME_PER_ROUND, TimeUnit.MILLISECONDS);
+            running = true;
+        }
+    }
+
+    static public void setNonPlayerCharacters(Game game, Player human) {
+        for(Player p : game.getPlayers()) {
+            if (p != human) {
+                npcs.add(new NonPlayerCharacter(p));
+            }
+        }
+    }
+
     @Deprecated
     static public Game init(Player... players) {
         if(players.length < 2) {
@@ -71,7 +115,7 @@ public class GameController {
      * @param platforms
      * @param gameName
      */
-    static public Game init(List<Player> players, Player human, List<Platform> platforms, int startUnitsCount, String gameName
+    static public Game init(List<Player> players, List<Platform> platforms, int startUnitsCount, String gameName
             , boolean randomStartPlat) {
         List<Platform> startPlats = new ArrayList<>(platforms);
         Game game = new Game();
@@ -90,10 +134,6 @@ public class GameController {
             }
         }
         for(Player p : players) {
-            if(p != human) {
-                npcs.add(new NonPlayerCharacter(p));
-            }
-
             if(!randomStartPlat) {
                 for(Platform plat : platforms) {
                     if(plat.getPlayer() == null) {
@@ -130,32 +170,9 @@ public class GameController {
         game.withPlayers(players).withPlatforms(platforms);
         game.setCurrentPlayer(players.get(0)).setName(gameName);
 
-        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-        exec.scheduleAtFixedRate(new Runnable() {
-
-            @Override
-            public void run() {
-                gameLoop(game);
-            }
-        }, 0, TIME_PER_ROUND, TimeUnit.MILLISECONDS);
+       startGameloop(game);
 
         return game;
-    }
-
-    static private void gameLoop(Game game) {
-        for(NonPlayerCharacter npc : npcs) {
-            npc.reinforce();
-        }
-
-        for(Player p : game.getPlayers()) {
-            for(int i = 0; i != p.getPlatforms().size() && p.getUnits().size() != MAXUNITS; i++) {
-                p.withUnits(new Unit());
-            }
-        }
-
-        for(NonPlayerCharacter npc : npcs) {
-            npc.attack();
-        }
     }
 
     static public void move(Platform source, Platform destination) {
@@ -268,7 +285,6 @@ public class GameController {
         int triesLeft = 2000;
         ArrayList<Platform> platforms = new ArrayList<>();
         outer: while(platforms.size() != playerCount * 3) {
-            System.out.println(triesLeft);
             if(triesLeft <0) {
                 return createRandomMap((int)(mapSizeX*1.1), (int)(mapSizeY*1.1), (int)(platSize*0.9), playerCount);
             }

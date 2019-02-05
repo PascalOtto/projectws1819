@@ -1,6 +1,7 @@
 package de.uniks.liverisk;
 
 import de.uniks.liverisk.gui.IngameUIController;
+import de.uniks.liverisk.gui.PersistenceUtil;
 import de.uniks.liverisk.logic.GameController;
 import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Player;
@@ -21,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -42,6 +44,8 @@ public class MainApp extends Application {
     private Button button_2Player;
     private Button button_3Player;
     private Button button_4Player;
+    private Button loadButton;
+    private Label loadingFailedLabel;
 
     private ArrayList<StringProperty> propertyNames = new ArrayList<>();
     private ArrayList<ObjectProperty<Color>> propertyColors = new ArrayList<>();
@@ -69,11 +73,17 @@ public class MainApp extends Application {
         button_4Player = new Button("Start 4-Player Game");
         button_4Player.setStyle(BUTTONSTYLE);
         button_4Player.setOnAction(e -> showPlayerSetting(e, primaryStage));
+        loadButton = new Button("Load");
+        loadButton.setStyle("-fx-background-color: orange; -fx-border-color: grey; -fx-font-size: 20px;");
+        loadButton.setOnAction(e -> loadGame(e, primaryStage));
+        loadingFailedLabel = new Label("Loading failed!");
+        loadingFailedLabel.setTextFill(Paint.valueOf("red"));
+        loadingFailedLabel.setVisible(false);
         vbox.setAlignment(Pos.CENTER);
         vboxButtons.setAlignment(Pos.CENTER);
         vboxTitle.setAlignment(Pos.CENTER);
         vboxTitle.getChildren().addAll(title, subTitle);
-        vboxButtons.getChildren().addAll(button_2Player, button_3Player, button_4Player);
+        vboxButtons.getChildren().addAll(button_2Player, button_3Player, button_4Player, loadButton, loadingFailedLabel);
         vbox.getChildren().addAll(vboxTitle, vboxButtons);
         Scene scene = new Scene(vbox, 800, 600);
         primaryStage.setScene(scene);
@@ -116,27 +126,36 @@ public class MainApp extends Application {
             vboxEdit.getChildren().addAll(hboxPlayer);
         }
         Button button_start = new Button("Start");
-        button_start.setOnAction(e -> showGame(e, primaryStage));
+        button_start.setOnAction(e -> showGame(e, primaryStage, null));
         button_start.setStyle(BUTTONSTYLE);
         vbox.getChildren().addAll(vboxTitle, vboxEdit, button_start);
         Scene scene = new Scene(vbox, primaryStage.getWidth(), primaryStage.getHeight());
         primaryStage.setScene(scene);
     }
 
-    public void showGame(ActionEvent event, Stage primaryStage){
+    public void showGame(ActionEvent event, Stage primaryStage, Game loadedGame){
         Game game;
-        ArrayList<Player> player = new ArrayList<>();
-        for(int i = 0; i != propertyNames.size(); i++) {
-            player.add(new Player().setName(propertyNames.get(i).getValue())
-                            .setColor(propertyColors.get(i).getValue().toString().substring(2)));
+        if(loadedGame == null) {
+            ArrayList<Player> player = new ArrayList<>();
+            for (int i = 0; i != propertyNames.size(); i++) {
+                player.add(new Player().setName(propertyNames.get(i).getValue())
+                        .setColor(propertyColors.get(i).getValue().toString().substring(2)));
+            }
+            //game = GameController.init(player, player.get(0), GameController.createSimpleMap(), 1, "Liverisk", true);
+            Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+            game = GameController.init(player
+                    , GameController.createRandomMap((int) (screenBounds.getWidth() * 0.5), (int) (screenBounds.getHeight() * 0.5), 150, player.size())
+                    , 1, "Liverisk", true);
+
+        }
+        else {
+            game = loadedGame;
+            GameController.startGameloop(game);
         }
         propertyNames.clear();
         propertyColors.clear();
-        //game = GameController.init(player, player.get(0), GameController.createSimpleMap(), 1, "Liverisk", true);
-        Rectangle2D screenBounds = Screen.getPrimary().getBounds();
-        game = GameController.init(player, player.get(0)
-                , GameController.createRandomMap((int)(screenBounds.getWidth()*0.5), (int)(screenBounds.getHeight()*0.5), 150, player.size())
-                , 1, "Liverisk", true);
+
+        GameController.setNonPlayerCharacters(game, game.getPlayers().get(0));
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gui/ingame.fxml"));
         try {
@@ -149,6 +168,18 @@ public class MainApp extends Application {
         catch(IOException e) {
             Logger.getGlobal().log(Level.SEVERE, "FXML Datei nicht gefunden!");
             e.printStackTrace();
+        }
+    }
+
+    public void loadGame(ActionEvent event, Stage primaryStage) {
+        PersistenceUtil persistenceUtil = new PersistenceUtil();
+        Game game = persistenceUtil.load();
+        if(game == null) {
+            loadingFailedLabel.setVisible(true);
+            return;
+        }
+        else {
+            showGame(event, primaryStage, game);
         }
     }
 }

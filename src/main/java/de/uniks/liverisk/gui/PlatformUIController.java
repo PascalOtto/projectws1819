@@ -139,10 +139,10 @@ public class PlatformUIController implements PropertyChangeListener {
 
     public void updateView() {
         updateUnitCount();
-        updateColor();
         updateCapacity();
         updatePosition();
         updateNeighbors();
+        updateColor();
     }
 
     public void updateColor() {
@@ -153,7 +153,10 @@ public class PlatformUIController implements PropertyChangeListener {
             platformPolygon.setFill(Paint.valueOf(platform.getPlayer().getColor()));
             for(Platform n : platform.getNeighbors()) {
                 if(n.getPlayer() == platform.getPlayer()) {
-                    searchLine(n).setColor(getColor());
+                    LineUIController linUI = searchLine(n);
+                    if(linUI != null) {
+                        linUI.setColor(getColor());
+                    }
                 }
             }
         }
@@ -191,12 +194,15 @@ public class PlatformUIController implements PropertyChangeListener {
     }
 
     public LineUIController searchLine(Platform p) {
+        if(!this.platform.getNeighbors().contains(p)) {
+            System.out.println("Critical");
+        }
         for(LineUIController ctrl : lines) {
             if(ctrl.compare(platform, p)) {
                 return ctrl;
             }
         }
-        Logger.getGlobal().log(Level.WARNING, "Line does not exist");
+        Logger.getGlobal().log(Level.WARNING, "Line does not exist between "+p.getNeighbors().toString()+" and "+this.platform.getNeighbors().toString());
         return null;
     }
 

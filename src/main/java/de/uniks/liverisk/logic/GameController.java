@@ -9,13 +9,12 @@ import de.uniks.liverisk.model.Player;
 import de.uniks.liverisk.model.Unit;
 import com.sun.javafx.geom.Point2D;
 import javafx.geometry.Pos;
-
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,10 +26,12 @@ public class GameController {
     static  Random ran = new Random();
     static List<NonPlayerCharacter> npcs = new ArrayList<>();
     static PersistenceUtil persistenceUtil = new PersistenceUtil();
+    static ScheduledFuture schedule = null;
 
     static private void gameLoop(Game game) {
         if(game.getWinner() != null) {
-            game.setTimeLeft(game.getTimePerRound());
+            game.setTimeLeft(0);
+            stopGameLoop();
             return;
         }
         if(game.getTimeLeft() > 0) {
@@ -56,10 +57,17 @@ public class GameController {
         persistenceUtil.save(game);
     }
 
+    static public void stopGameLoop() {
+        if(schedule != null) {
+            schedule.cancel(false);
+        }
+        schedule = null;
+    }
+
     static public void startGameloop(Game game) {
         if(game.getIsRunning() == false) {
             ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-            exec.scheduleAtFixedRate(new Runnable() {
+            schedule = exec.scheduleAtFixedRate(new Runnable() {
 
                 @Override
                 public void run() {
@@ -290,6 +298,73 @@ public class GameController {
         return list;
     }
 
+    static class MyPoint {
+        double x;
+        double y;
+        public MyPoint(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+        public MyPoint sum(MyPoint other) {
+           return new MyPoint(this.x + other.x, this.y + other.y);
+        }
+
+        public MyPoint difference(MyPoint other) {
+            return new MyPoint(this.x - other.x, this.y - other.y);
+        }
+    }
+    static class MyLine {
+        public MyPoint start;
+        public MyPoint direction;
+        public MyLine(MyPoint start, MyPoint end) {
+            this.start = start;
+            this.direction = end.difference(start);
+        }
+        boolean checkCollide(MyLine line) {
+            MyPoint right = line.start.difference(this.start);
+            MyPoint otherDirection = new MyPoint(-line.direction.x, -line.direction.y);
+            if(otherDirection.y*this.direction.x-this.direction.y*otherDirection.x == 0d) {
+                return false;
+            }
+            double s = (right.y*this.direction.x-this.direction.y*right.x)/
+                    (otherDirection.y*this.direction.x-this.direction.y*otherDirection.x);
+            if(s >= 0 && s <= 1) {
+                return true;
+            }
+            return false;
+        }
+        boolean checkCollide(MySquare square) {
+            double x = square.position.x;
+            double y = square.position.y;
+            double hside = square.side/2;
+            MyPoint c1 = new MyPoint(x-hside, y-hside);
+            MyPoint c2 = new MyPoint(x-hside, y+hside);
+            MyPoint c3 = new MyPoint(x+hside, y+hside);
+            MyPoint c4 = new MyPoint(x+hside, y-hside);
+            if(checkCollide(new MyLine(c1, c2))) {
+                return true;
+            }
+            if(checkCollide(new MyLine(c2, c3))) {
+                return true;
+            }
+            if(checkCollide(new MyLine(c3, c4))) {
+                return true;
+            }
+            if(checkCollide(new MyLine(c4, c1))) {
+                return true;
+            }
+            return false;
+        }
+    }
+    static class MySquare {
+        MyPoint position;
+        double side;
+        public MySquare(MyPoint position, double side) {
+            this.position = position;
+            this.side = side;
+        }
+    }
+
     static public List<Platform> createRandomMap(int mapSizeX, int mapSizeY, int platSize, int playerCount) {
         int triesLeft = 2000;
         ArrayList<Platform> platforms = new ArrayList<>();
@@ -301,15 +376,11 @@ public class GameController {
             Point2D randomPoint = randomPosition(mapSizeX - platSize, mapSizeY - platSize);
            // Intersect with other link
             for(Platform p1 : platforms) {
-                Line2D link = new Line2D();
                 for(Platform p2 : p1.getNeighbors()) {
-                    //AWT functions are used here, because JavaFx seems to be fucked up
-                        java.awt.geom.Line2D linkAWT = new java.awt.geom.Line2D.Double();
-                        ((java.awt.geom.Line2D.Double) linkAWT).setLine(p1.getXPos(), p1.getYPos(), p2.getXPos(), p2.getYPos());
-                        Rectangle2D rect = new Rectangle2D.Double();
-                        ((Rectangle2D.Double) rect).setRect(randomPoint.x-platSize/2, randomPoint.y-platSize/2
-                                , platSize, platSize);
-                        if(linkAWT.intersects(rect)) {
+                        MyLine line = new MyLine(new MyPoint(p1.getXPos(), p1.getYPos())
+                                , new MyPoint( p2.getXPos(), p2.getYPos()));
+                        MySquare rect = new MySquare(new MyPoint(randomPoint.x, randomPoint.y), platSize);
+                        if(line.checkCollide(rect)) {
                             triesLeft--;
                             continue outer;
                         }
@@ -341,15 +412,11 @@ public class GameController {
                             triesLeft--;
                             continue checkLink;
                         }
-                        //AWT functions are used here, because JavaFx seems to be fucked up
                         for(Platform plat : platforms) {
                             if(plat == target) continue;
-                            java.awt.geom.Line2D linkAWT = new java.awt.geom.Line2D.Double();
-                            ((java.awt.geom.Line2D.Double) linkAWT).setLine(link.x1, link.y1, link.x2, link.y2);
-                            Rectangle2D rect = new Rectangle2D.Double();
-                            ((Rectangle2D.Double) rect).setRect(plat.getXPos()-platSize/2, plat.getYPos()-platSize/2
-                                    , platSize, platSize);
-                            if(linkAWT.intersects(rect)) {
+                            MyLine line = new MyLine(new MyPoint(link.x1, link.y1), new MyPoint(link.x2, link.y2));
+                            MySquare rect = new MySquare(new MyPoint(plat.getXPos(), plat.getYPos()), platSize);
+                            if(line.checkCollide(rect)) {
                                 triesLeft--;
                                 continue checkLink;
                             }

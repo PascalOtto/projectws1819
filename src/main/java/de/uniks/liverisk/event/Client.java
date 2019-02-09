@@ -34,7 +34,6 @@ public class Client {
             socket = new Socket(ip, 42424);
             new ClientCallAgent(socket, this);
         } catch (IOException e) {
-            e.printStackTrace();
             return false;
         }
         return true;
@@ -88,6 +87,7 @@ public class Client {
     }
 
     public void disconnect() {
+        if(socket == null) return;
         try {
             socket.close();
         } catch (IOException e) {

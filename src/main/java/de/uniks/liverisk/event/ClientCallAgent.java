@@ -34,9 +34,6 @@ public class ClientCallAgent
                     client.processMessage(in);
                 }
             } catch (Exception e) {
-                if(e.getClass() == EOFException.class) {
-                }
-                e.printStackTrace();
             }
         }
     }

@@ -41,6 +41,7 @@ public class SocketMan {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return;
         }
         socketList.add(socket);
         sgc.playerConnected();

@@ -55,6 +55,9 @@ public class ServerGameController {
 
     public void playerDisconnected() {
         sendPlayerID();
+        if(socketMan.getSocketCount() == 0) {
+            game = null;
+        }
     }
 
     private void sendPlayerID() {

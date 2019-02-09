@@ -3,8 +3,6 @@ package de.uniks.liverisk;
 import de.uniks.liverisk.event.Client;
 import de.uniks.liverisk.event.ServerGameController;
 import de.uniks.liverisk.logic.GameController;
-import de.uniks.liverisk.model.Game;
-import de.uniks.liverisk.model.Player;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
@@ -16,14 +14,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import sun.applet.Main;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 public class OnlineSettingsView {
     Stage primaryStage;

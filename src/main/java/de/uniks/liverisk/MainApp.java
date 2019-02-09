@@ -51,7 +51,7 @@ public class MainApp extends Application {
     private Button button_4Player;
     private Button loadButton;
     private Label loadingFailedLabel;
-    IngameUIController ingameUI;
+    private IngameUIController ingameUI;
     private ArrayList<StringProperty> propertyNames = new ArrayList<>();
     private ArrayList<ObjectProperty<Color>> propertyColors = new ArrayList<>();
 
@@ -59,6 +59,11 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        ingameUI = null;
+        GameController.client = null;
+        if(client != null) {
+            client.disconnect();
+        }
         onlineSettingsView = new OnlineSettingsView(primaryStage, this);
         client = new Client(onlineSettingsView, this);
         onlineSettingsView.setClient(client);

@@ -19,7 +19,6 @@ public class LineUIController {
         if(a==null || b==null|| a==b) {
             Logger.getGlobal().log(Level.WARNING, "error in line initialization!");
         }
-
         this.a = a;
         this.b = b;
         line = new Line();
@@ -27,7 +26,7 @@ public class LineUIController {
         line.setStartY(a.getYPos() + platformHeight/2);
         line.setEndX(b.getXPos() + platformWidth/2);
         line.setEndY(b.getYPos() + platformHeight/2);
-        line.setStyle("-fx-stroke: black;");
+        line.setStroke(Paint.valueOf("black"));
         line.setStrokeWidth(9);
         playground.getChildren().add(line);
     }

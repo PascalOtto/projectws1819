@@ -50,6 +50,7 @@ public class PlayerCardUIController implements PropertyChangeListener {
        updatePlayerName();
        updatePlayerColor();
        updateUnitCount();
+       updateAlive();
     }
 
     public void updateUnitCount() {

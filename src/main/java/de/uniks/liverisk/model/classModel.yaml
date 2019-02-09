@@ -22,20 +22,20 @@
   roles: 	platform13 	player14 	
 
 - platform4: 	Clazz
-  attributes: 	capacity15 	xPos16 	yPos17 	
+  attributes: 	id15 	capacity16 	xPos17 	yPos18 	
   model: 	c1
   modified: 	false
   name: 	Platform
   propertyStyle: 	POJO
-  roles: 	game18 	selectedBy19 	neighbors20 	neighbors21 	player22 	units23 	
+  roles: 	game19 	selectedBy20 	neighbors21 	neighbors22 	player23 	units24 	
 
 - game5: 	Clazz
-  attributes: 	name24 	timeLeft25 	timePerRound26 	isRunning27 	
+  attributes: 	name25 	timeLeft26 	timePerRound27 	isRunning28 	
   model: 	c1
   modified: 	false
   name: 	Game
   propertyStyle: 	POJO
-  roles: 	platforms28 	selectedPlatform29 	players30 	winner31 	currentPlayer32 	
+  roles: 	platforms29 	selectedPlatform30 	players31 	winner32 	currentPlayer33 	
 
 - name6: 	Attribute
   clazz: 	player2
@@ -57,7 +57,7 @@
   clazz: 	player2
   modified: 	false
   name: 	game
-  other: 	players30
+  other: 	players31
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -67,7 +67,7 @@
   clazz: 	player2
   modified: 	false
   name: 	gameWon
-  other: 	winner31
+  other: 	winner32
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -77,7 +77,7 @@
   clazz: 	player2
   modified: 	false
   name: 	currentGame
-  other: 	currentPlayer32
+  other: 	currentPlayer33
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -87,7 +87,7 @@
   clazz: 	player2
   modified: 	false
   name: 	platforms
-  other: 	player22
+  other: 	player23
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -107,7 +107,7 @@
   clazz: 	unit3
   modified: 	false
   name: 	platform
-  other: 	units23
+  other: 	units24
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -121,54 +121,51 @@
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- capacity15: 	Attribute
+- id15: 	Attribute
+  clazz: 	platform4
+  modified: 	false
+  name: 	id
+  propertyStyle: 	POJO
+  type: 	int
+
+- capacity16: 	Attribute
   clazz: 	platform4
   modified: 	false
   name: 	capacity
   propertyStyle: 	POJO
   type: 	int
 
-- xPos16: 	Attribute
+- xPos17: 	Attribute
   clazz: 	platform4
   modified: 	false
   name: 	xPos
   propertyStyle: 	POJO
   type: 	double
 
-- yPos17: 	Attribute
+- yPos18: 	Attribute
   clazz: 	platform4
   modified: 	false
   name: 	yPos
   propertyStyle: 	POJO
   type: 	double
 
-- game18: 	AssocRole
+- game19: 	AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	platform4
   modified: 	false
   name: 	game
-  other: 	platforms28
+  other: 	platforms29
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- selectedBy19: 	AssocRole
+- selectedBy20: 	AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	platform4
   modified: 	false
   name: 	selectedBy
-  other: 	selectedPlatform29
-  propertyStyle: 	POJO
-  roleType: 	"java.util.ArrayList<%s>"
-
-- neighbors20: 	AssocRole
-  aggregation: 	false
-  cardinality: 	42
-  clazz: 	platform4
-  modified: 	false
-  name: 	neighbors
-  other: 	neighbors21
+  other: 	selectedPlatform30
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -178,11 +175,21 @@
   clazz: 	platform4
   modified: 	false
   name: 	neighbors
-  other: 	neighbors20
+  other: 	neighbors22
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- player22: 	AssocRole
+- neighbors22: 	AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	platform4
+  modified: 	false
+  name: 	neighbors
+  other: 	neighbors21
+  propertyStyle: 	POJO
+  roleType: 	"java.util.ArrayList<%s>"
+
+- player23: 	AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	platform4
@@ -192,7 +199,7 @@
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- units23: 	AssocRole
+- units24: 	AssocRole
   aggregation: 	false
   cardinality: 	42
   clazz: 	platform4
@@ -202,21 +209,21 @@
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- name24: 	Attribute
+- name25: 	Attribute
   clazz: 	game5
   modified: 	false
   name: 	name
   propertyStyle: 	POJO
   type: 	String
 
-- timeLeft25: 	Attribute
+- timeLeft26: 	Attribute
   clazz: 	game5
   modified: 	false
   name: 	timeLeft
   propertyStyle: 	POJO
   type: 	int
 
-- timePerRound26: 	Attribute
+- timePerRound27: 	Attribute
   clazz: 	game5
   initialization: 	10000
   modified: 	false
@@ -224,7 +231,7 @@
   propertyStyle: 	POJO
   type: 	int
 
-- isRunning27: 	Attribute
+- isRunning28: 	Attribute
   clazz: 	game5
   initialization: 	false
   modified: 	false
@@ -232,27 +239,27 @@
   propertyStyle: 	POJO
   type: 	boolean
 
-- platforms28: 	AssocRole
+- platforms29: 	AssocRole
   aggregation: 	false
   cardinality: 	42
   clazz: 	game5
   modified: 	false
   name: 	platforms
-  other: 	game18
+  other: 	game19
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- selectedPlatform29: 	AssocRole
+- selectedPlatform30: 	AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	game5
   modified: 	false
   name: 	selectedPlatform
-  other: 	selectedBy19
+  other: 	selectedBy20
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- players30: 	AssocRole
+- players31: 	AssocRole
   aggregation: 	false
   cardinality: 	42
   clazz: 	game5
@@ -262,7 +269,7 @@
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- winner31: 	AssocRole
+- winner32: 	AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	game5
@@ -272,7 +279,7 @@
   propertyStyle: 	POJO
   roleType: 	"java.util.ArrayList<%s>"
 
-- currentPlayer32: 	AssocRole
+- currentPlayer33: 	AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	game5

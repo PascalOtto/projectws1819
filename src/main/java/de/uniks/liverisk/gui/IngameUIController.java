@@ -6,18 +6,22 @@ import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Platform;
 import de.uniks.liverisk.model.Player;
 import de.uniks.liverisk.model.Unit;
+import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -36,27 +40,29 @@ public class IngameUIController {
     @FXML
     AnchorPane playground;
 
+    @FXML
+    ScrollPane scrollPane;
+
     static final String BUTTONSTYLE = "-fx-background-color: orange; -fx-border-color: grey; -fx-font-size: 15px;" +
             " -fx-padding: 10 20 10 20";
 
     private Game game;
     private ProgressBar progressBar = new ProgressBar();
     private Label winnerLabel = new Label();
+    ArrayList<PlayerCardUIController> cards = new ArrayList<>();
+
+    boolean initialized= false;
 
     public void myInitialize(Game game, Stage primaryStage, MainApp mainApp) {
+        if(game.getWinner()!= null) {
+            onWin();
+        }
+        playground.getChildren().clear();
         LineUIController.playground = playground;
         this.game = game;
-        for(Player p : game.getPlayers()) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("player_card.fxml"));
-                Parent parent = fxmlLoader.load();
-                playerList.getChildren().add(parent);
-                PlayerCardUIController pcc = fxmlLoader.getController();
-                pcc.setPlayer(p);
-            } catch (IOException e) {
-                Logger.getGlobal().log(Level.SEVERE, "FXML Datei nicht gefunden!");
-                e.printStackTrace();
-            }
+
+        for(int i = 0; i != cards.size() && i != game.getPlayers().size(); i++) {
+            cards.get(i).setPlayer(game.getPlayers().get(i));
         }
 
         //Create PlatformsViews
@@ -72,28 +78,50 @@ public class IngameUIController {
                 e.printStackTrace();
             }
         }
+        updateProgressBar();
+        game.addPropertyChangeListener(Game.PROPERTY_timeLeft, e -> updateProgressBar());
 
-        //Winner Label
-        winnerLabel.setTextFill(Paint.valueOf("gold"));
-        winnerLabel.setVisible(false);
-        winnerLabel.setStyle("-fx-font-size: 15px;");
-        game.addPropertyChangeListener(Game.PROPERTY_winner, e->onWin());
-        sidebar.getChildren().add(winnerLabel);
+        if(initialized == false) {
+            for(Player p : game.getPlayers()) {
+                try {
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("player_card.fxml"));
+                    Parent parent = fxmlLoader.load();
+                    playerList.getChildren().add(parent);
+                    PlayerCardUIController pcc = fxmlLoader.getController();
+                    pcc.setPlayer(p);
+                    cards.add(pcc);
+                } catch (IOException e) {
+                    Logger.getGlobal().log(Level.SEVERE, "FXML Datei nicht gefunden!");
+                    e.printStackTrace();
+                }
+            }
 
-        //Create Round-Progress-Bar
-        sidebar.getChildren().add(progressBar);
-        game.addPropertyChangeListener(Game.PROPERTY_timeLeft, e->updateProgressBar());
+            //Winner Label
+            winnerLabel.setTextFill(Paint.valueOf("gold"));
+            winnerLabel.setVisible(false);
+            winnerLabel.setStyle("-fx-font-size: 15px;");
+            game.addPropertyChangeListener(Game.PROPERTY_winner, e -> onWin());
+            sidebar.getChildren().add(winnerLabel);
 
-        //Buttons
-        Button nextRound = new Button("next Round");
-        nextRound.setOnAction(e->onClickNextRound());
-        nextRound.setStyle(BUTTONSTYLE);
-        sidebar.getChildren().add(nextRound);
+            //Create Round-Progress-Bar
+            sidebar.getChildren().add(progressBar);
 
-        Button menue = new Button("Start Screen");
-        menue.setOnAction(e->onClickMenue(primaryStage, mainApp));
-        menue.setStyle(BUTTONSTYLE);
-        sidebar.getChildren().add(menue);
+            //Buttons
+            Button nextRound = new Button("next Round");
+            nextRound.setOnAction(e -> onClickNextRound());
+            nextRound.setStyle(BUTTONSTYLE);
+            sidebar.getChildren().add(nextRound);
+
+            Button menue = new Button("Start Screen");
+            menue.setOnAction(e -> onClickMenue(primaryStage, mainApp));
+            menue.setStyle(BUTTONSTYLE);
+            sidebar.getChildren().add(menue);
+
+            scrollPane.setPrefWidth(Screen.getPrimary().getBounds().getWidth());
+            scrollPane.setPrefHeight(Screen.getPrimary().getBounds().getHeight());
+            scrollPane.setPannable(true);
+            initialized = true;
+        }
     }
 
     public void updateProgressBar() {
@@ -111,12 +139,13 @@ public class IngameUIController {
 
     public void onClickMenue(Stage primaryStage, MainApp mainApp) {
         PersistenceUtil p = new PersistenceUtil();
+        GameController.stopGameLoop();
         p.save(game);
         try {
             mainApp.start(primaryStage);
         }
         catch(Exception e) {
-            System.out.println(e.getStackTrace());
+            Logger.getGlobal().log(Level.SEVERE, "Could not load startpage again!");
         }
     }
 

@@ -1,6 +1,7 @@
 package de.uniks.liverisk.gui;
 
 import de.uniks.liverisk.logic.GameController;
+import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Platform;
 import de.uniks.liverisk.model.Player;
 import javafx.collections.ObservableList;
@@ -16,6 +17,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.input.MouseEvent;
+import org.fulib.yaml.YamlIdMap;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -35,8 +38,8 @@ public class PlatformUIController implements PropertyChangeListener {
     AnchorPane selectionPane;
     Platform platform;
 
-    static PlatformUIController selectedPlatform = null;
     static List<LineUIController> lines = new ArrayList<>();
+    static int selectedPlat = -1;
 
     public void onMouseClicked(MouseEvent mouseEvent) {
         switch(mouseEvent.getButton()) {
@@ -52,63 +55,58 @@ public class PlatformUIController implements PropertyChangeListener {
     private void secondaryKeyClicked() {
         if(platform.getPlayer() == platform.getGame().getCurrentPlayer() && platform.getCapacity() != platform.getUnits().size()) {
             GameController.reenforce(this.platform);
-            if(selectedPlatform != null) {
-                selectedPlatform.unselect();
-            }
-            select();
+
+            this.platform.getGame().setSelectedPlatform(this.platform);
         }
     }
 
     private void primaryKeyClicked() {
-        if(selectedPlatform == null) {
-            select();
+        Game game = this.platform.getGame();
+        if(game.getSelectedPlatform() == null) {
+            game.setSelectedPlatform(this.platform);
         }
-        else if(selectedPlatform == this) {
-            unselect();
-        }
-        else if(this.platform.getNeighbors().contains(selectedPlatform.platform)
-                    && selectedPlatform.platform.getPlayer() == platform.getGame().getCurrentPlayer()) {
-            if(selectedPlatform.platform.getUnits().size() > 1) {
-                if (this.platform.getPlayer() == null || selectedPlatform.platform.getPlayer() == this.platform.getPlayer()) {
+        else if(this.platform.getNeighbors().contains(game.getSelectedPlatform())
+                    && game.getSelectedPlatform().getPlayer() == platform.getGame().getCurrentPlayer()) {
+            if(game.getSelectedPlatform().getUnits().size() > 1) {
+                if (this.platform.getPlayer() == null || game.getSelectedPlatform().getPlayer() == this.platform.getPlayer()) {
                     if(this.platform.getUnits().size() == this.platform.getCapacity()) {
-                        selectedPlatform.unselect();
+                        game.setSelectedPlatform(null);
                         return;
                     }
-                    GameController.move(selectedPlatform.platform, this.platform);
-                    if(selectedPlatform.platform.getUnits().size() == 1) {
-                        selectedPlatform.unselect();
-                        select();
+                    GameController.move(game.getSelectedPlatform(), this.platform);
+                    if(game.getSelectedPlatform().getUnits().size() == 1) {
+                        game.setSelectedPlatform(this.platform);
                     }
                 }
                 else {
-                    GameController.attack(selectedPlatform.platform, this.platform);
-                    if(this.platform.getPlayer() == selectedPlatform.platform.getPlayer()) {
-                        selectedPlatform.unselect();
-                        select();
+                    GameController.attack(game.getSelectedPlatform(), this.platform);
+                    if(this.platform.getPlayer() == game.getSelectedPlatform().getPlayer()) {
+                        game.setSelectedPlatform(this.platform);
                     }
                 }
             }
             else {
-                selectedPlatform.unselect();
-                select();
+                game.setSelectedPlatform(this.platform);
             }
         }
         else {
-            selectedPlatform.unselect();
-            select();
+            game.setSelectedPlatform(this.platform);
         }
     }
 
     public void setPlatform(Platform platform) {
         this.platform = platform;
         platform.addPropertyChangeListener(this);
+        if(this.platform.getId() == selectedPlat) {
+           this.platform.getGame().setSelectedPlatform(this.platform);
+        }
         updateView();
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
         if(evt.getPropertyName() == Platform.PROPERTY_player) {
             updateView();
-            checkWinningCondition();
+            checkWinningCondition(this.platform);
         }
         else if(evt.getPropertyName() == Platform.PROPERTY_units) {
             updateUnitCount();
@@ -121,6 +119,15 @@ public class PlatformUIController implements PropertyChangeListener {
         }
         else if(evt.getPropertyName() == Platform.PROPERTY_xPos || evt.getPropertyName() == Platform.PROPERTY_yPos) {
             updatePosition();
+        }
+        else if(evt.getPropertyName() == Platform.PROPERTY_selectedBy) {
+            if(this.platform.getSelectedBy() != null) {
+                selectionPane.setVisible(true);
+                selectedPlat = this.platform.getId();
+            }
+            else {
+                selectionPane.setVisible(false);
+            }
         }
     }
 
@@ -196,18 +203,6 @@ public class PlatformUIController implements PropertyChangeListener {
         }
     }
 
-    public void select() {
-        if(selectedPlatform != null) {
-            selectedPlatform.unselect();
-        }
-        selectionPane.setVisible(true);
-        selectedPlatform = this;
-    }
-    public void unselect() {
-        selectionPane.setVisible(false);
-        selectedPlatform = null;
-    }
-
     public LineUIController searchLine(Platform p) {
         if(!this.platform.getNeighbors().contains(p)) {
             System.out.println("Critical");
@@ -225,7 +220,7 @@ public class PlatformUIController implements PropertyChangeListener {
         return platformPolygon.getFill();
     }
 
-    public void checkWinningCondition() {
+    static public void checkWinningCondition(Platform platform) {
         ArrayList<Player> activePlayers = new ArrayList<>(platform.getGame().getPlayers());
         for(Player p : platform.getGame().getPlayers()) {
             if(p.getPlatforms().size() == 0) {

@@ -416,4 +416,33 @@ public Platform withoutNeighbors(Object... value)
 
 
 
+
+
+   public static final String PROPERTY_id = "id";
+
+   private int id;
+
+   public int getId()
+   {
+      return id;
+   }
+
+   public Platform setId(int value)
+   {
+      if (value != this.id)
+      {
+         int oldValue = this.id;
+         this.id = value;
+         firePropertyChange("id", oldValue, value);
+      }
+      return this;
+   }
+
+
+
+
+
+
+
+
 }

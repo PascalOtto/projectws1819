@@ -2,6 +2,8 @@ package de.uniks.liverisk.logic;
 
 import com.sun.javafx.geom.Line2D;
 import com.sun.javafx.geom.RectBounds;
+import de.uniks.liverisk.event.Client;
+import de.uniks.liverisk.event.ServerGameController;
 import de.uniks.liverisk.gui.PersistenceUtil;
 import de.uniks.liverisk.model.Game;
 import de.uniks.liverisk.model.Platform;
@@ -10,6 +12,7 @@ import de.uniks.liverisk.model.Unit;
 import com.sun.javafx.geom.Point2D;
 import javafx.geometry.Pos;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -21,12 +24,14 @@ import java.util.logging.Logger;
 
 public class GameController {
     static final int MAXUNITS = 16;
-    static final int UPDATE_RATE = 50;
+    private static int UPDATE_RATE = 50;
 
     static  Random ran = new Random();
     static List<NonPlayerCharacter> npcs = new ArrayList<>();
     static PersistenceUtil persistenceUtil = new PersistenceUtil();
     static ScheduledFuture schedule = null;
+    // sets this in online mode! Actions will not be executed!
+    public static Client client = null;
 
     static private void gameLoop(Game game) {
         if(game.getWinner() != null) {
@@ -34,27 +39,28 @@ public class GameController {
             stopGameLoop();
             return;
         }
-        if(game.getTimeLeft() > 0) {
-            game.setTimeLeft(game.getTimeLeft()-UPDATE_RATE);
-            return;
-        }
-        game.setTimeLeft(game.getTimePerRound());
+        if(game.getTimeLeft() <= 0) {
 
-        for(NonPlayerCharacter npc : npcs) {
-            npc.reinforce();
-        }
-
-        for(Player p : game.getPlayers()) {
-            for(int i = 0; i != p.getPlatforms().size() && p.getUnits().size() != MAXUNITS; i++) {
-                p.withUnits(new Unit());
+            for (NonPlayerCharacter npc : npcs) {
+                npc.reinforce();
             }
-        }
 
-        for(NonPlayerCharacter npc : npcs) {
-            npc.attack();
-        }
+            for (Player p : game.getPlayers()) {
+                for (int i = 0; i != p.getPlatforms().size() && p.getUnits().size() != MAXUNITS; i++) {
+                    p.withUnits(new Unit());
+                }
+            }
 
-        persistenceUtil.save(game);
+            for (NonPlayerCharacter npc : npcs) {
+                npc.attack();
+            }
+
+            persistenceUtil.save(game);
+            game.setTimeLeft(game.getTimePerRound());
+        }
+        else {
+            game.setTimeLeft(game.getTimeLeft()-UPDATE_RATE);
+        }
     }
 
     static public void stopGameLoop() {
@@ -64,7 +70,8 @@ public class GameController {
         schedule = null;
     }
 
-    static public void startGameloop(Game game) {
+    static public void startGameloop(Game game, int update_rate) {
+        UPDATE_RATE = update_rate;
         if(game.getIsRunning() == false) {
             ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
             schedule = exec.scheduleAtFixedRate(new Runnable() {
@@ -78,10 +85,10 @@ public class GameController {
         }
     }
 
-    static public void setNonPlayerCharacters(Game game, Player human) {
-        for(Player p : game.getPlayers()) {
-            if (p != human) {
-                npcs.add(new NonPlayerCharacter(p));
+    static public void setNonPlayerCharacters(Game game, int humans) {
+        for(int i = 0; i != game.getPlayers().size(); i++) {
+            if (i >= humans) {
+                npcs.add(new NonPlayerCharacter(game.getPlayers().get(i)));
             }
         }
     }
@@ -144,7 +151,10 @@ public class GameController {
             Logger.getGlobal().log(Level.WARNING, "At least 1 start-unit needed!");
             return null;
         }
+        int id = 0;
         for(Platform p : platforms) {
+            //give ids
+            p.setId(id++);
             if(p.getCapacity() < 1) {
                 Logger.getGlobal().log(Level.WARNING, "Every Platform needs at least capacity = 1");
                 return null;
@@ -187,8 +197,6 @@ public class GameController {
         game.withPlayers(players).withPlatforms(platforms);
         game.setCurrentPlayer(players.get(0)).setName(gameName);
 
-       startGameloop(game);
-
         return game;
     }
 
@@ -219,10 +227,20 @@ public class GameController {
         }
 
 
-        if(destination.getUnits().size() == 0) {
-            destination.setPlayer(source.getPlayer());
+        if(client == null) {
+            if (destination.getUnits().size() == 0) {
+                destination.setPlayer(source.getPlayer());
+            }
+            source.getUnits().get(0).setPlatform(destination);
         }
-        source.getUnits().get(0).setPlatform(destination);
+        else {
+            LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+            map.put(ServerGameController.EVENT_TYPE, ServerGameController.MOVE_EVENT);
+            map.put(ServerGameController.EVENT_KEY, client.getPlayerId()+"");
+            map.put(ServerGameController.SOURCEPLAT_KEY, source.getId()+"");
+            map.put(ServerGameController.DESTPLAT_KEY, destination.getId()+"");
+            client.newMessage(map);
+        }
     }
 
     static public void reenforce(Platform platform) {
@@ -238,12 +256,22 @@ public class GameController {
             Logger.getGlobal().log(Level.WARNING, "No more space on this platform");
             return;
         }
-        for(Unit u : platform.getPlayer().getUnits()) {
-            if(u.getPlatform() == null) {
-                u.setPlatform(platform);
-                u.setPlayer(null);
-                return;
+
+        if(client == null) {
+            for(Unit u : platform.getPlayer().getUnits()) {
+                if(u.getPlatform() == null) {
+                    u.setPlatform(platform);
+                    u.setPlayer(null);
+                    return;
+                }
             }
+        }
+        else {
+            LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+            map.put(ServerGameController.EVENT_TYPE, ServerGameController.REENFORCE_EVENT);
+            map.put(ServerGameController.EVENT_KEY, client.getPlayerId()+"");
+            map.put(ServerGameController.DESTPLAT_KEY, platform.getId()+"");
+            client.newMessage(map);
         }
     }
 
@@ -273,12 +301,23 @@ public class GameController {
             destination.getUnits().get(0).removeYou();
             source.getUnits().get(0).removeYou();
         }
-        if(destination.getUnits().size() == 0) {
-            destination.setPlayer(null);
-            while(source.getUnits().size() > 1) {
-                destination.setPlayer(source.getPlayer());
-                source.getUnits().get(0).setPlatform(destination);
+
+        if(client == null) {
+            if(destination.getUnits().size() == 0) {
+                destination.setPlayer(null);
+                while(source.getUnits().size() > 1) {
+                    destination.setPlayer(source.getPlayer());
+                    source.getUnits().get(0).setPlatform(destination);
+                }
             }
+        }
+        else {
+            LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+            map.put(ServerGameController.EVENT_TYPE, ServerGameController.ATTACK_EVENT);
+            map.put(ServerGameController.EVENT_KEY, client.getPlayerId()+"");
+            map.put(ServerGameController.SOURCEPLAT_KEY, source.getId()+"");
+            map.put(ServerGameController.DESTPLAT_KEY, destination.getId()+"");
+            client.newMessage(map);
         }
     }
 

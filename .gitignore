@@ -4,3 +4,4 @@ out/
 .gradle/
 gradle/
 savegame.yaml
+src/main/java/META-INF/MANIFEST.MF

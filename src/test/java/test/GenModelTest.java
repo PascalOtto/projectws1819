@@ -14,6 +14,7 @@ public class GenModelTest {
                 .buildAttribute("color", mb.STRING);
         ClassBuilder unit = mb.buildClass("Unit");
         ClassBuilder platform = mb.buildClass("Platform")
+                .buildAttribute("id", mb.INT)
                 .buildAttribute("capacity", mb.INT)
                 .buildAttribute("xPos", mb.DOUBLE)
                 .buildAttribute("yPos", mb.DOUBLE);
@@ -32,7 +33,6 @@ public class GenModelTest {
         platform.buildAssociation(player, "player", mb.ONE, "platforms", mb.MANY);
         platform.buildAssociation(unit, "units", mb.MANY, "platform", mb.ONE);
         player.buildAssociation(unit, "units", mb.MANY, "player", mb.ONE);
-
 
         Fulib.generator().generate(mb.getClassModel());
     }

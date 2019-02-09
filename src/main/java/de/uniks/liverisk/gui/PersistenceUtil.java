@@ -19,36 +19,44 @@ public class PersistenceUtil {
 
     public void save(Game game) {
         try {
-            YamlIdMap yamlIdMap = new YamlIdMap(Game.class.getPackage().getName());
-            String yaml = yamlIdMap.encode(game);
             File file = new File(SAVEGAME_YAML);
             if (!file.exists()) {
                 file.createNewFile();
             }
-            Files.write(Paths.get(file.toURI()), yaml.getBytes(ENCODING));
+            Files.write(Paths.get(file.toURI()), getString(game).getBytes(ENCODING));
         }
-        catch(IOException e) {
+        catch(Exception e) {
             Logger.getGlobal().log(Level.WARNING, "Save method failed: " + e.toString());
         }
     }
 
+    public String getString(Game game) {
+        YamlIdMap yamlIdMap = new YamlIdMap(Game.class.getPackage().getName());
+        String yaml = yamlIdMap.encode(game);
+        return yaml;
+    }
+
     public Game load() {
         try {
-            YamlIdMap yamlIdMap = new YamlIdMap(Game.class.getPackage().getName());
-            Game game = new Game();
-            game.setName("Liverisk"); // yaml-decode fails, if you don't do this
             File file = new File(SAVEGAME_YAML);
             if(!file.exists()) {
                 throw new IOException("No file found");
             }
             byte[] bytes = Files.readAllBytes(Paths.get(file.toURI()));
             String yaml = new String(bytes, ENCODING);
-           yamlIdMap.decode(yaml, game);
-           return game;
+
+           return load(yaml);
         }
         catch(IOException e) {
-            Logger.getGlobal().log(Level.WARNING, "Load method failed: " + e.toString());
+            //Logger.getGlobal().log(Level.WARNING, "Load method failed: " + e.toString());
             return null;
         }
+    }
+    public Game load(String yamlString) {
+        YamlIdMap yamlIdMap = new YamlIdMap(Game.class.getPackage().getName());
+        Game game = new Game();
+        game.setName("Liverisk"); // yaml-decode fails, if you don't do this
+        yamlIdMap.decode(yamlString, game);
+        return game;
     }
 }

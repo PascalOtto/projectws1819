@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <HBox alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uniks.liverisk.gui.IngameUIController">
    <children>
-      <AnchorPane fx:id="playground" prefHeight="400.0" prefWidth="600.0" />
+      <ScrollPane fx:id="scrollPane" prefHeight="200.0" prefWidth="200.0">
+         <content>
+            <AnchorPane fx:id="playground" prefHeight="400.0" prefWidth="600.0" />
+         </content>
+      </ScrollPane>
       <VBox fx:id="sidebar" alignment="TOP_CENTER" layoutX="610.0" layoutY="10.0" prefHeight="400.0" prefWidth="100.0" spacing="30.0" style="-fx-background-color: blue;">
          <children>
             <VBox fx:id="playerList" alignment="TOP_CENTER" prefHeight="400.0" prefWidth="100.0" spacing="30.0" style="-fx-background-color: teal;" />
